@@ -1,4 +1,4 @@
-name: Build Dev APKs
+name: Build Dev APK
 
 on:
   workflow_dispatch:
@@ -22,18 +22,16 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > my-release-key.jks
 
-      - name: Build Dev APK 1
+      - name: Build APK
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/my-release-key.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleVariant1Release
+        run: ./gradlew assembleRelease
 
-      - name: Build Dev APK 2
-        env:
-          KEYSTORE_PATH: ${{ github.workspace }}/my-release-key.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleVariant2Release
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: termux-app
+          path: app/build/outputs/apk/release/*.apk
